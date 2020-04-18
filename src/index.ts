@@ -1,29 +1,10 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, { Express } from 'express';
+import itemRouter from './routes/item-routes';
 
 const app: Express = express();
 
-const router = express.Router();
-
 app.use(express.json());
 
-interface Item {
-    id: number;
-    name: string;
-    price: number;
-};
-
-const items: Item[] = [];
-
-router.get('/items', (req: Request, res: Response, next: NextFunction) => {
-    res.send(items);
-});
-
-router.post('/items', (req: Request, res: Response, next: NextFunction) => {
-    items.push(req.body);
-
-    res.send(req.body);
-});
-
-app.use(router);
+app.use('/items', itemRouter);
 
 app.listen(5000, () => {});
