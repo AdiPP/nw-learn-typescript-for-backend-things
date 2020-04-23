@@ -22,7 +22,47 @@ const items: Item[] = [
 /* Class Based */
 export default class ItemController {
     static index(req: Request, res: Response, next: NextFunction) {
-        res.send(items);
+        console.log(req.query.price);
+        if (Object.keys(req.query).length !== 0) {
+            // Filter berdasarkan name
+            const matches: Item[] = []; // Deklarasi dan inisialisasi variabel matches untuk menyimpan hasil
+            const toSearch: string = (req.query.q !== undefined) ? String(req.query.q) : ''; // Deklarasi dan 
+            const price: Number | boolean = (req.query.price !== undefined) ? Number(Object.values(req.query.price)) : false;
+            const comparison: string | boolean = (req.query.q !== undefined) ? String(Object.keys(req.query.price)) : false;
+            items.forEach(item => {
+                if (item.name.indexOf(toSearch) > -1) {
+                    if (price !== false) {
+                        switch (comparison) {
+                            case 'is':
+                                if (item.price === price)
+                                    matches.push(item);       
+                                break;
+                            case 'lte':
+                                if (item.price <= price)
+                                    matches.push(item);
+                                break;
+                            case 'gte':
+                                if (item.price >= price)
+                                    matches.push(item);
+                                break;
+                            default:
+                                matches.push(item);
+                                break;
+                        }   
+                    } else {
+                        matches.push(item);
+                    }
+                }
+            });
+            if(matches.length === 0)
+                return res.status(404).send({
+                    errors: {
+                        message: 'Item not found',
+                    }
+                });
+            return res.send(matches);
+        }
+        return res.send(items);
     }
 
     static store(req: Request, res: Response, next: NextFunction) {

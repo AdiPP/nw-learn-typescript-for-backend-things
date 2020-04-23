@@ -20,7 +20,53 @@ const items = [
 /* Class Based */
 class ItemController {
     static index(req, res, next) {
-        res.send(items);
+        if (Object.keys(req.query).length !== 0) {
+            // Filter berdasarkan name
+            const matches = []; // Deklarasi variabel hasil
+            const toSearch = (req.query.q !== undefined) ? String(req.query.q) : ''; // Deklarasi variabel kata kunci pencarian
+            const price = (req.query.price !== undefined) ? Number(Object.values(req.query.price)) : false; // Deklarasi variabel harga
+            const comparison = (req.query.price !== undefined) ? String(Object.keys(req.query.price)) : false; // Deklarasi variabel pembanding
+            items.forEach(item => {
+                // Foreach variabel item
+                if (item.name.indexOf(toSearch) > -1) {
+                    // Mencari nilai dari variabel item yang sesuai dengan kata kunci pencarian
+                    if (price !== false) {
+                        // Jika variabel harga tidak false
+                        switch (comparison) {
+                            // Menyesuaikan hasil dengan pembanding
+                            case 'is':
+                                if (item.price === price)
+                                    matches.push(item);
+                                break;
+                            case 'lte':
+                                if (item.price <= price)
+                                    matches.push(item);
+                                break;
+                            case 'gte':
+                                if (item.price >= price)
+                                    matches.push(item);
+                                break;
+                            default:
+                                matches.push(item);
+                                break;
+                        }
+                    }
+                    else {
+                        // Jika variabel harga false
+                        matches.push(item);
+                    }
+                }
+            });
+            if (matches.length === 0)
+                // Throw error jika item tidak ditemukan
+                return res.status(404).send({
+                    errors: {
+                        message: 'Items not found',
+                    }
+                });
+            return res.send(matches);
+        }
+        return res.send(items);
     }
     static store(req, res, next) {
         // Push req.body ke items

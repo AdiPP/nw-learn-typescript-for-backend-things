@@ -7,6 +7,7 @@ const express_1 = require("express");
 const item_controller_1 = __importDefault(require("../controllers/item-controller"));
 const router = express_1.Router();
 router.get('/', item_controller_1.default.index);
+router.get('/', item_controller_1.default.index);
 router.get('/:id', item_controller_1.default.show);
 router.post('/', item_controller_1.default.store);
 router.put('/:id', item_controller_1.default.update);
